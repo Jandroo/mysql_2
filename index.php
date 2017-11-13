@@ -1,6 +1,8 @@
+<!DOCTYPE html>
 <html>
  <head>
- 	<title>Exemple de lectura de dades a MySQL</title>
+  	<title>Exemple de lectura de dades a MySQL</title>
+ 	<meta charset="utf-8">
  	<style>
  		body{
  		}
