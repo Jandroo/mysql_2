@@ -8,3 +8,5 @@ I despres ens conectem a la base de dades amb aquesta comanda: "mysql -u "usuari
 
 I finalment en la part dels dos fichers tens que fer aixo:
 En la connexion a la base de dades ("mysqli_connect") dels dos fichers tens que posar el teu usuari i la teva contrasenya.
+
+I per començar la ruta ha de ser la del form.php, perque automaticament es veu el index.php.
