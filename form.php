@@ -6,37 +6,42 @@
 <body>
 
 <form action="index.php" method="post">
-Pais: <select name="code">
+Continent: 
 
-	<?php
- 		# (1.1) Connectem a MySQL (host,usuari,contrassenya)
- 		$conn = mysqli_connect('localhost','root','anovoa1996');
- 
- 		# (1.2) Triem la base de dades amb la que treballarem
- 		mysqli_select_db($conn, 'world');
- 
- 		# (2.1) creem el string de la consulta (query)
- 		$consulta = "SELECT Name, Code FROM country";
+<?php
+  //connexió dins block try-catch:
+  //  prova d'executar el contingut del try
+  //  si falla executa el catch
+  try {
+    $hostname = "localhost";
+    $dbname = "world";
+    $username = "root";
+    $pw = "anovoa1996";
+    $pdo = new PDO ("mysql:host=$hostname;dbname=$dbname","$username","$pw");
+  } catch (PDOException $e) {
+    echo "Failed to get DB handle: " . $e->getMessage() . "\n";
+    exit;
+  }
 
- 
- 		# (2.2) enviem la query al SGBD per obtenir el resultat
- 		$resultat = mysqli_query($conn, $consulta);
- 
- 		# (2.3) si no hi ha resultat (0 files o bé hi ha algun error a la sintaxi)
- 		#     posem un missatge d'error i acabem (die) l'execució de la pàgina web
- 		if (!$resultat) {
-     			$message  = 'Consulta invàlida: ' . mysqli_error() . "\n";
-     			$message .= 'Consulta realitzada: ' . $consulta;
-     			die($message);
- 		}
- 		# (3.2) Bucle while
- 		while( $registre = mysqli_fetch_assoc($resultat) )
- 		{
- 			echo "<option value='".$registre["Code"]."'>".$registre["Name"]."</option>";
- 		}
- 	?>
+  //preparem i executem la consulta
+  $query = $pdo->prepare("select distinct Continent FROM country");
+  $query->execute();
+
+  //anem agafant les fileres d'amb una amb una
+  echo "<select name='Continent'>";
+  $row = $query->fetch();
+  while ( $row ) {
+    echo "<option>". $row['Continent']. "</option>";
+    $row = $query->fetch();
+  }
+  echo "</select>";
+  //eliminem els objectes per alliberar memòria 
+  unset($pdo); 
+  unset($query)
+
+
+?>
  	<input type="submit" name="submit"/>
- 	</select>
 </form>
 </body>
 </html>

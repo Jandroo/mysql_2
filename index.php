@@ -15,53 +15,54 @@
  
  <body>
  	<h1>Exemple de lectura de dades a MySQL</h1>
- 
- 	<?php
- 		# (1.1) Connectem a MySQL (host,usuari,contrassenya)
- 		$conn = mysqli_connect('localhost','root','anovoa1996');
- 
- 		# (1.2) Triem la base de dades amb la que treballarem
- 		mysqli_select_db($conn, 'world');
- 
- 		# (2.1) creem el string de la consulta (query)
- 		$consulta = "SELECT * FROM city where CountryCode='".$_POST['code']."';";
 
- 
- 		# (2.2) enviem la query al SGBD per obtenir el resultat
- 		$resultat = mysqli_query($conn, $consulta);
- 
- 		# (2.3) si no hi ha resultat (0 files o bé hi ha algun error a la sintaxi)
- 		#     posem un missatge d'error i acabem (die) l'execució de la pàgina web
- 		if (!$resultat) {
-     			$message  = 'Consulta invàlida: ' . mysqli_error() . "\n";
-     			$message .= 'Consulta realitzada: ' . $consulta;
-     			die($message);
- 		}
- 	?>
- 
+ <?php
+  //connexió dins block try-catch:
+  //  prova d'executar el contingut del try
+  //  si falla executa el catch
+  try {
+    $hostname = "localhost";
+    $dbname = "world";
+    $username = "root";
+    $pw = "anovoa1996";
+    $pdo = new PDO ("mysql:host=$hostname;dbname=$dbname","$username","$pw");
+  } catch (PDOException $e) {
+    echo "Failed to get DB handle: " . $e->getMessage() . "\n";
+    exit;
+  }
+  $continent = $_POST['Continent'];
+  //preparem i executem la consulta
+  $query = $pdo->prepare("select Name, Population FROM country where Continent='".$continent."';");
+  $query->execute();
+
+?>
  	<!-- (3.1) aquí va la taula HTML que omplirem amb dades de la BBDD -->
  	<table>
  	<!-- la capçalera de la taula l'hem de fer nosaltres -->
  	<thead><td colspan="4" align="center" bgcolor="cyan">Llistat de Ciutats</td></thead>
  	<?php
  		# (3.2) Bucle while
- 		while( $registre = mysqli_fetch_assoc($resultat) )
- 		{
- 			# els \t (tabulador) i els \n (salt de línia) son perquè el codi font quedi llegible
-  
- 			# (3.3) obrim fila de la taula HTML amb <tr>
- 			echo "\t<tr>\n";
- 
- 			# (3.4) cadascuna de les columnes ha d'anar precedida d'un <td>
- 			#	després concatenar el contingut del camp del registre
- 			#	i tancar amb un </td>
- 			echo "\t\t<td>".$registre["Name"]."</td>\n";
- 			echo "\t\t<td>".$registre['CountryCode']."</td>\n";
- 			echo "\t\t<td>".$registre["District"]."</td>\n";
- 			echo "\t\t<td>".$registre['Population']."</td>\n";
- 			# (3.5) tanquem la fila
- 			echo "\t</tr>\n";
- 		}
+		  $row = $query->fetch();
+		  while ( $row ) {
+		  	echo "<tr>";
+			    echo "<td>". $row['Name']. "</td>";
+			    echo "<td>". $row['Population']. "</td>";
+		    echo "</tr>";
+		    $row = $query->fetch();
+		  }
+		   $query = $pdo->prepare("select sum(Population) as Total FROM country where Continent='".$continent."';");
+		   $query->execute();
+
+  		  $row = $query->fetch();
+		  while ( $row ) {
+		  	echo "<tr>";
+		  		echo "<td>TOTAL</td>";
+			    echo "<td>". $row['Total']. "</td>";
+		    echo "</tr>";
+		    $row = $query->fetch();
+		  }
+		  unset($pdo); 
+  		  unset($query);
  	?>
   	<!-- (3.6) tanquem la taula -->
  	</table>	
