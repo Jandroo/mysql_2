@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<form action="index.php" method="post">
+<form action="Exercici2.php" method="post">
 Continent: 
 
 <?php
